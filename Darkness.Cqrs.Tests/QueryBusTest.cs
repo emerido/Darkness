@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Darkness.Cqrs.Simple;
 using Moq;
 using Xunit;
 
@@ -10,13 +11,13 @@ namespace Darkness.Cqrs.Tests
     {
         
         private readonly CancellationToken _cancellationToken;
-        private readonly Mock<IQueryHandlerFactory> _mockHandlerFactory;
+        private readonly Mock<IQueryHandlerResolver> _mockHandlerFactory;
         private readonly QueryBus _dispatcher;
 
         public QueryBusTest()
         {
             _cancellationToken = CancellationToken.None;
-            _mockHandlerFactory = new Mock<IQueryHandlerFactory>();
+            _mockHandlerFactory = new Mock<IQueryHandlerResolver>();
             _dispatcher = new QueryBus(_mockHandlerFactory.Object);
         }
 
@@ -33,7 +34,7 @@ namespace Darkness.Cqrs.Tests
                 .ReturnsAsync(fakeModel);
             
             _mockHandlerFactory
-                .Setup(x => x.CreateHandler(typeof(IQueryHandler<FakeQuery, FakeModel>)))
+                .Setup(x => x.Resolve(typeof(IQueryHandler<FakeQuery, FakeModel>)))
                 .Returns(handler.Object);
             
             var result = await _dispatcher.Ask(fakeQuery, _cancellationToken);

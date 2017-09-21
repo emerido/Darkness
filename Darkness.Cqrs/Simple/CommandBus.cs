@@ -1,28 +1,28 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Darkness.Cqrs
+namespace Darkness.Cqrs.Simple
 {
     public class CommandBus : ICommandBus
     {
         
-        private ICommandHandlerFactory Factory { get; }
+        private ICommandHandlerResolver Resolver { get; }
 
-        public CommandBus(ICommandHandlerFactory factory)
+        public CommandBus(ICommandHandlerResolver resolver)
         {
-            Factory = factory;
+            Resolver = resolver;
         }
 
         public Task Handle(ICommand command, CancellationToken token = default(CancellationToken))
         {
-            var handler = Factory.CreateHandler(typeof(ICommandHandler<>).MakeGenericType(command.GetType()));
+            var handler = Resolver.Resolve(typeof(ICommandHandler<>).MakeGenericType(command.GetType()));
 
             return (Task) Invoke(handler, command, token);
         }
 
         public Task<TResult> Handle<TResult>(ICommand<TResult> command, CancellationToken token = default(CancellationToken))
         {
-            var handler = Factory.CreateHandler(typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult)));
+            var handler = Resolver.Resolve(typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult)));
 
             return (Task<TResult>) Invoke(handler, command, token);
         }

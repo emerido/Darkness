@@ -3,10 +3,10 @@
 namespace Darkness.Cqrs
 {
     
-    public interface IQueryHandlerFactory
+    public interface IQueryHandlerResolver
     {
         
-        object CreateHandler(Type type);
+        object Resolve(Type type);
         
     }
     

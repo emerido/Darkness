@@ -2,6 +2,7 @@ using Moq;
 using Xunit;
 using System.Threading;
 using System.Threading.Tasks;
+using Darkness.Cqrs.Simple;
 
 namespace Darkness.Cqrs.Tests
 {
@@ -10,13 +11,13 @@ namespace Darkness.Cqrs.Tests
     {
         
         private readonly CancellationToken _cancellationToken;
-        private readonly Mock<ICommandHandlerFactory> _mockHandlerFactory;
+        private readonly Mock<ICommandHandlerResolver> _mockHandlerFactory;
         private readonly CommandBus _dispatcher;
 
         public CommandBusTest()
         {
             _cancellationToken = CancellationToken.None;
-            _mockHandlerFactory = new Mock<ICommandHandlerFactory>();
+            _mockHandlerFactory = new Mock<ICommandHandlerResolver>();
             _dispatcher = new CommandBus(_mockHandlerFactory.Object);
         }
 
@@ -33,7 +34,7 @@ namespace Darkness.Cqrs.Tests
                 .ReturnsAsync(fakeResult);
             
             _mockHandlerFactory
-                .Setup(x => x.CreateHandler(typeof(ICommandHandler<NonVoidCommand, CommandResult>)))
+                .Setup(x => x.Resolve(typeof(ICommandHandler<NonVoidCommand, CommandResult>)))
                 .Returns(handler.Object);
 
             var result = await _dispatcher.Handle(fakeCommand, _cancellationToken);
@@ -53,7 +54,7 @@ namespace Darkness.Cqrs.Tests
                 .Returns(Task.CompletedTask);
             
             _mockHandlerFactory
-                .Setup(x => x.CreateHandler(typeof(ICommandHandler<VoidCommand>)))
+                .Setup(x => x.Resolve(typeof(ICommandHandler<VoidCommand>)))
                 .Returns(handler.Object);
 
             await _dispatcher.Handle(voidCommand, _cancellationToken);

@@ -1,22 +1,22 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Darkness.Cqrs
+namespace Darkness.Cqrs.Simple
 {
     public class QueryBus : IQueryBus
     {
-        private IQueryHandlerFactory Factory { get; }
+        private IQueryHandlerResolver Resolver { get; }
 
-        public QueryBus(IQueryHandlerFactory factory)
+        public QueryBus(IQueryHandlerResolver resolver)
         {
-            Factory = factory;
+            Resolver = resolver;
         }
 
         public Task<TResult> Ask<TResult>(IQuery<TResult> query, CancellationToken token = default(CancellationToken))
         {
             var queryType = query.GetType();
 
-            var handler = Factory.CreateHandler(typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResult)));
+            var handler = Resolver.Resolve(typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResult)));
 
             var method = handler.GetType().GetMethod("Handle", new[] {query.GetType(), token.GetType()});
 
