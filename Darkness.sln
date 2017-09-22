@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Darkness.Cqrs.Tests", "Dark
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Darkness.Event", "Darkness.Event\Darkness.Event.csproj", "{6644C5A6-60A5-4BFB-A8BC-03E9093A3552}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Darkness.Event.Tests", "Darkness.Event.Tests\Darkness.Event.Tests.csproj", "{4DCBECD4-49BA-4638-9FD3-F11833DBAD56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Darkness.Event.SimpleInjector", "Darkness.Event.SimpleInjector\Darkness.Event.SimpleInjector.csproj", "{AB3BD570-5DE0-42F5-AF07-7FAF86EE17C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{6644C5A6-60A5-4BFB-A8BC-03E9093A3552}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6644C5A6-60A5-4BFB-A8BC-03E9093A3552}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6644C5A6-60A5-4BFB-A8BC-03E9093A3552}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DCBECD4-49BA-4638-9FD3-F11833DBAD56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DCBECD4-49BA-4638-9FD3-F11833DBAD56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DCBECD4-49BA-4638-9FD3-F11833DBAD56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DCBECD4-49BA-4638-9FD3-F11833DBAD56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3BD570-5DE0-42F5-AF07-7FAF86EE17C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3BD570-5DE0-42F5-AF07-7FAF86EE17C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3BD570-5DE0-42F5-AF07-7FAF86EE17C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3BD570-5DE0-42F5-AF07-7FAF86EE17C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
