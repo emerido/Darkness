@@ -13,6 +13,9 @@ namespace Darkness.Event.Simple
 
         public void Emit<TEvent>(TEvent @event) where TEvent : IEvent
         {
+            if (@event == null) 
+                throw new ArgumentNullException(nameof(@event));
+            
             foreach (var handler in _resolver.Resolve<TEvent>())
             {
                 handler.Handle(@event);

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Darkness.Cqrs.Simple
@@ -14,6 +15,9 @@ namespace Darkness.Cqrs.Simple
 
         public Task<TResult> Ask<TResult>(IQuery<TResult> query, CancellationToken token = default(CancellationToken))
         {
+            if (query == null) 
+                throw new ArgumentNullException(nameof(query));
+            
             var queryType = query.GetType();
 
             var handler = Resolver.Resolve(typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResult)));

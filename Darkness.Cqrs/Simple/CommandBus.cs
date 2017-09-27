@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Darkness.Cqrs.Simple
@@ -15,6 +16,9 @@ namespace Darkness.Cqrs.Simple
 
         public Task Handle(ICommand command, CancellationToken token = default(CancellationToken))
         {
+            if (command == null) 
+                throw new ArgumentNullException(nameof(command));
+            
             var handler = Resolver.Resolve(typeof(ICommandHandler<>).MakeGenericType(command.GetType()));
 
             return (Task) Invoke(handler, command, token);
@@ -22,6 +26,9 @@ namespace Darkness.Cqrs.Simple
 
         public Task<TResult> Handle<TResult>(ICommand<TResult> command, CancellationToken token = default(CancellationToken))
         {
+            if (command == null) 
+                throw new ArgumentNullException(nameof(command));
+            
             var handler = Resolver.Resolve(typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult)));
 
             return (Task<TResult>) Invoke(handler, command, token);
