@@ -1,4 +1,4 @@
-token = `cat NuGet.token`
+token = `cat ../NuGet.token`
 
 publish:
 	@cd $(project) && rm -rf bin/Release/
