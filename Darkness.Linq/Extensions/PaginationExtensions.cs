@@ -44,7 +44,7 @@ namespace Darkness.Linq.Extensions
             => await PaginateAsync(query, paginal, new TPager());
 
 
-        public static async Task<TPager> PaginateToAsync<TPager, TElement>(this IQueryable<TElement> query, TPager pager, IPaginal paginal)
+        public static async Task<TPager> PaginateToAsync<TPager, TElement>(this IQueryable<TElement> query, IPaginal paginal, TPager pager)
             where TPager : IPaginated<TElement>
             => await PaginateAsync(query, paginal, pager);
 
