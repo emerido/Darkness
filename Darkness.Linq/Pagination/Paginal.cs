@@ -1,4 +1,7 @@
-﻿namespace Darkness.Linq.Pagination
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Darkness.Linq.Pagination
 {
     public class Paginal : IPaginal
     {
@@ -12,8 +15,12 @@
             Take = take;
         }
 
+        [Range(1, int.MaxValue)]
+        [Required]
         public int Page { get; set; }
         
+        [Range(1, int.MaxValue)]
+        [DefaultValue(10)]
         public int Take { get; set; }
         
     }
