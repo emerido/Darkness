@@ -7,9 +7,13 @@ namespace Darkness.Cqrs
     public interface ICommandBus
     {
 
-        Task Handle(ICommand command, CancellationToken token = default(CancellationToken));
+        void Handle(ICommand command);
 
-        Task<TResult> Handle<TResult>(ICommand<TResult> command, CancellationToken token = default(CancellationToken));
+        TResult Handle<TResult>(ICommand<TResult> command);
+        
+        Task HandleAsync(ICommand command, CancellationToken token = default(CancellationToken));
+
+        Task<TResult> HandleAsync<TResult>(ICommand<TResult> command, CancellationToken token = default(CancellationToken));
 
     }
     

@@ -22,7 +22,28 @@ namespace Darkness.Cqrs.Tests
         }
 
         [Fact]
-        public async void HandlerResolveAndCall()
+        public async void Handle_Async_Query()
+        {
+            var fakeQuery = new FakeQuery();
+            var fakeModel = new FakeModel();
+            
+            var handler = new Mock<IQueryHandlerAsync<FakeQuery, FakeModel>>();
+            
+            handler
+                .Setup(x => x.Handle(fakeQuery, _cancellationToken))
+                .ReturnsAsync(fakeModel);
+            
+            _mockHandlerFactory
+                .Setup(x => x.Resolve(typeof(IQueryHandlerAsync<FakeQuery, FakeModel>)))
+                .Returns(handler.Object);
+            
+            var result = await _dispatcher.AskAsync(fakeQuery, _cancellationToken);
+            
+            Assert.Equal(result, fakeModel);
+        }
+        
+        [Fact]
+        public void Handle_Query()
         {
             var fakeQuery = new FakeQuery();
             var fakeModel = new FakeModel();
@@ -30,18 +51,17 @@ namespace Darkness.Cqrs.Tests
             var handler = new Mock<IQueryHandler<FakeQuery, FakeModel>>();
             
             handler
-                .Setup(x => x.Handle(fakeQuery, _cancellationToken))
-                .ReturnsAsync(fakeModel);
+                .Setup(x => x.Handle(fakeQuery))
+                .Returns(fakeModel);
             
             _mockHandlerFactory
                 .Setup(x => x.Resolve(typeof(IQueryHandler<FakeQuery, FakeModel>)))
                 .Returns(handler.Object);
             
-            var result = await _dispatcher.Ask(fakeQuery, _cancellationToken);
+            var result = _dispatcher.Ask(fakeQuery);
             
             Assert.Equal(result, fakeModel);
         }
-        
     }
     
     public class FakeQuery : IQuery<FakeModel>

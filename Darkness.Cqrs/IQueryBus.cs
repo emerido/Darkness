@@ -5,6 +5,10 @@ namespace Darkness.Cqrs
 {
     public interface IQueryBus
     {
-        Task<TResult> Ask<TResult>(IQuery<TResult> query, CancellationToken token = default(CancellationToken));
+        
+        TResult Ask<TResult>(IQuery<TResult> query);
+        
+        Task<TResult> AskAsync<TResult>(IQuery<TResult> query, CancellationToken token = default(CancellationToken));
+        
     }
 }
