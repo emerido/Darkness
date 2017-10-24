@@ -13,7 +13,7 @@ namespace Darkness.Cqrs
     public interface IQueryHandler<in TQuery, out TResult, in TContext> 
         where TQuery : IQuery<TResult> where TContext : class
     {
-        TResult Handle(TQuery query);
+        TResult Handle(TQuery query, TContext context);
     }
     
     public interface IQueryHandlerAsync<in TQuery, TResult> 

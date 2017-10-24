@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +14,6 @@ namespace Darkness.Cqrs.Simple
         {
             Resolver = resolver;
         }
-
         
         public void Handle(ICommand command)
         {
@@ -34,7 +34,7 @@ namespace Darkness.Cqrs.Simple
             var handler = Resolver.Resolve(typeof(ICommandHandler<,>)
                 .MakeGenericType(command.GetType(), typeof(TContext)));
             
-            Invoke(handler, command);
+            Invoke(handler, command, context);
         }
 
         public Task HandleAsync(ICommand command, CancellationToken token = default(CancellationToken))
@@ -57,28 +57,27 @@ namespace Darkness.Cqrs.Simple
             var handler = Resolver.Resolve(typeof(ICommandHandlerAsync<,>)
                 .MakeGenericType(command.GetType(), typeof(TContext)));
 
-            return (Task) InvokeAsync(handler, command, token);
+            return (Task) InvokeAsync(handler, command, context, token);
 
         }
 
-
-        private static void Invoke(object handler, object command)
+        private static void Invoke(object handler, params object[] args)
         {
             if (handler == null)
             {
                 throw new ArgumentException("Handler not found");
             }
             handler.GetType()
-                .GetMethod("Handle", new[] {command.GetType()})
-                .Invoke(handler, new[] {command});
+                .GetMethod("Handle", args.Select(x => x.GetType()).ToArray())
+                .Invoke(handler, args);
 
         }
         
-        private static object InvokeAsync(object handler, object command, CancellationToken token)
+        private static object InvokeAsync(object handler, params object[] args)
         {
             return handler.GetType()
-                .GetMethod("Handle", new[] {command.GetType(), token.GetType()})
-                .Invoke(handler, new[] {command, token});
+                .GetMethod("Handle", args.Select(x => x.GetType()).ToArray())
+                .Invoke(handler, args);
 
         }
         

@@ -71,7 +71,7 @@ namespace Darkness.Cqrs.Simple
             var handler = Resolver.Resolve(typeof(IQueryHandlerAsync<,,>)
                 .MakeGenericType(queryType, resultType, contextType));
 
-            var method = handler.GetType().GetMethod("Handle", new[] {queryType, token.GetType()});
+            var method = handler.GetType().GetMethod("Handle", new[] {queryType, contextType, token.GetType()});
 
             return (Task<TResult>) method.Invoke(handler, new object[] {query, context, token});
         }

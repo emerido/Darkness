@@ -62,6 +62,50 @@ namespace Darkness.Cqrs.Tests
             
             Assert.Equal(result, fakeModel);
         }
+        
+        [Fact]
+        public void Handle_Query_With_Context()
+        {
+            var fakeQuery = new FakeQuery();
+            var fakeModel = new FakeModel();
+            var fakeContext = new FakeContext();
+            
+            var handler = new Mock<IQueryHandler<FakeQuery, FakeModel, FakeContext>>();
+            
+            handler
+                .Setup(x => x.Handle(fakeQuery, fakeContext))
+                .Returns(fakeModel);
+            
+            _mockHandlerFactory
+                .Setup(x => x.Resolve(typeof(IQueryHandler<FakeQuery, FakeModel, FakeContext>)))
+                .Returns(handler.Object);
+            
+            var result = _dispatcher.Ask(fakeQuery, fakeContext);
+            
+            Assert.Equal(result, fakeModel);
+        }
+        
+        [Fact]
+        public async void Handle_Async_Query_With_Context()
+        {
+            var fakeQuery = new FakeQuery();
+            var fakeModel = new FakeModel();
+            var fakeContext = new FakeContext();
+            
+            var handler = new Mock<IQueryHandlerAsync<FakeQuery, FakeModel, FakeContext>>();
+            
+            handler
+                .Setup(x => x.Handle(fakeQuery, fakeContext, _cancellationToken))
+                .ReturnsAsync(fakeModel);
+            
+            _mockHandlerFactory
+                .Setup(x => x.Resolve(typeof(IQueryHandlerAsync<FakeQuery, FakeModel, FakeContext>)))
+                .Returns(handler.Object);
+            
+            var result = await _dispatcher.AskAsync(fakeQuery, fakeContext, _cancellationToken);
+            
+            Assert.Equal(result, fakeModel);
+        }
     }
     
     public class FakeQuery : IQuery<FakeModel>
@@ -73,8 +117,11 @@ namespace Darkness.Cqrs.Tests
     {
 			
     }
-    
-    
+
+    public class FakeContext
+    {
+        
+    }
     
     
 }

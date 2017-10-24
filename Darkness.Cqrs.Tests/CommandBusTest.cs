@@ -78,7 +78,7 @@ namespace Darkness.Cqrs.Tests
         }
         
         [Fact]
-        public async void Handle_Command_With_Result_Async_Handler()
+        public async void Handle_Command_With_Context_Async_Handler()
         {
             var fakeCommand = new Command();
             var fakeContext = new CommandContext();
@@ -95,10 +95,7 @@ namespace Darkness.Cqrs.Tests
         }
         
     }
-    
-    
-    
-    
+
     public class Command : ICommand
     {
 			
