@@ -6,6 +6,7 @@ namespace Darkness.Cqrs.Simple
 {
     public class QueryBus : IQueryBus
     {
+        
         private IQueryHandlerResolver Resolver { get; }
 
         public QueryBus(IQueryHandlerResolver resolver)
@@ -27,6 +28,23 @@ namespace Darkness.Cqrs.Simple
             return (TResult) method.Invoke(handler, new object[] {query});
         }
 
+        public TResult Ask<TResult, TContext>(IQuery<TResult> query, TContext context)
+        {
+            if (query == null) 
+                throw new ArgumentNullException(nameof(query));
+            
+            var queryType = query.GetType();
+            var resultType = typeof(TResult);
+            var contextType = typeof(TContext);
+
+            var handler = Resolver.Resolve(typeof(IQueryHandler<,,>)
+                .MakeGenericType(queryType, resultType, contextType));
+
+            var method = handler.GetType().GetMethod("Handle", new[] {queryType, contextType});
+
+            return (TResult) method.Invoke(handler, new object[] {query, context});
+        }
+
         public Task<TResult> AskAsync<TResult>(IQuery<TResult> query, CancellationToken token = default(CancellationToken))
         {
             if (query == null) 
@@ -40,6 +58,22 @@ namespace Darkness.Cqrs.Simple
 
             return (Task<TResult>) method.Invoke(handler, new object[] {query, token});
         }
-        
+
+        public Task<TResult> AskAsync<TResult, TContext>(IQuery<TResult> query, TContext context, CancellationToken token = default(CancellationToken))
+        {
+            if (query == null) 
+                throw new ArgumentNullException(nameof(query));
+            
+            var queryType = query.GetType();
+            var resultType = typeof(TResult);
+            var contextType = typeof(TContext);
+
+            var handler = Resolver.Resolve(typeof(IQueryHandlerAsync<,,>)
+                .MakeGenericType(queryType, resultType, contextType));
+
+            var method = handler.GetType().GetMethod("Handle", new[] {queryType, token.GetType()});
+
+            return (Task<TResult>) method.Invoke(handler, new object[] {query, context, token});
+        }
     }
 }
