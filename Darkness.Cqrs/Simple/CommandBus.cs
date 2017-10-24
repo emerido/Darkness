@@ -25,18 +25,18 @@ namespace Darkness.Cqrs.Simple
 
             Invoke(handler, command);
         }
-        
-        public TResult Handle<TResult>(ICommand<TResult> command) 
+
+        public void Handle<TContext>(ICommand command, TContext context)
         {
             if (command == null) 
                 throw new ArgumentNullException(nameof(command));
-            
-            var handler = Resolver.Resolve(typeof(ICommandHandler<,>)
-                .MakeGenericType(command.GetType(), typeof(TResult)));
 
-            return (TResult) Invoke(handler, command);
+            var handler = Resolver.Resolve(typeof(ICommandHandler<,>)
+                .MakeGenericType(command.GetType(), typeof(TContext)));
+            
+            Invoke(handler, command);
         }
-        
+
         public Task HandleAsync(ICommand command, CancellationToken token = default(CancellationToken))
         {
             if (command == null) 
@@ -46,32 +46,39 @@ namespace Darkness.Cqrs.Simple
                 .MakeGenericType(command.GetType()));
 
             return (Task) InvokeAsync(handler, command, token);
+
         }
 
-        public Task<TResult> HandleAsync<TResult>(ICommand<TResult> command, CancellationToken token = default(CancellationToken))
+        public Task HandleAsync<TContext>(ICommand command, TContext context, CancellationToken token = default(CancellationToken))
         {
             if (command == null) 
                 throw new ArgumentNullException(nameof(command));
             
             var handler = Resolver.Resolve(typeof(ICommandHandlerAsync<,>)
-                .MakeGenericType(command.GetType(), typeof(TResult)));
+                .MakeGenericType(command.GetType(), typeof(TContext)));
 
-            return (Task<TResult>) InvokeAsync(handler, command, token);
+            return (Task) InvokeAsync(handler, command, token);
+
         }
 
-        private object Invoke(object handler, object command)
+
+        private static void Invoke(object handler, object command)
         {
-            return handler.GetType()
+            if (handler == null)
+            {
+                throw new ArgumentException("Handler not found");
+            }
+            handler.GetType()
                 .GetMethod("Handle", new[] {command.GetType()})
-                .Invoke(handler, new object[] {command});
+                .Invoke(handler, new[] {command});
 
         }
         
-        private object InvokeAsync(object handler, object command, CancellationToken token)
+        private static object InvokeAsync(object handler, object command, CancellationToken token)
         {
             return handler.GetType()
                 .GetMethod("Handle", new[] {command.GetType(), token.GetType()})
-                .Invoke(handler, new object[] {command, token});
+                .Invoke(handler, new[] {command, token});
 
         }
         

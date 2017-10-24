@@ -9,11 +9,11 @@ namespace Darkness.Cqrs
 
         void Handle(ICommand command);
 
-        TResult Handle<TResult>(ICommand<TResult> command);
+        void Handle<TContext>(ICommand command, TContext context);
         
         Task HandleAsync(ICommand command, CancellationToken token = default(CancellationToken));
 
-        Task<TResult> HandleAsync<TResult>(ICommand<TResult> command, CancellationToken token = default(CancellationToken));
+        Task HandleAsync<TContext>(ICommand command, TContext context, CancellationToken token = default(CancellationToken));
 
     }
     

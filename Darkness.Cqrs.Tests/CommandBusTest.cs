@@ -23,37 +23,33 @@ namespace Darkness.Cqrs.Tests
 
         
         [Fact]
-        public void Handle_Command_With_Result_Handler()
+        public void Handle_Command_With_Context_Handler()
         {
-            
-            var fakeCommand = new NonVoidCommand();
-            var fakeResult = new CommandResult();
+            var fakeCommand = new Command();
+            var fakeContext = new CommandContext();
 
-            var handler = new Mock<ICommandHandler<NonVoidCommand, CommandResult>>();
-                handler.Setup(x => x.Handle(fakeCommand))
-                .Returns(fakeResult);
+            var handler = new Mock<ICommandHandler<Command, CommandContext>>();
+            handler.Setup(x => x.Handle(fakeCommand, fakeContext));
             
             _mockHandlerFactory
-                .Setup(x => x.Resolve(typeof(ICommandHandler<NonVoidCommand, CommandResult>)))
+                .Setup(x => x.Resolve(typeof(ICommandHandler<Command, CommandContext>)))
                 .Returns(handler.Object);
 
-            var result = _dispatcher.Handle(fakeCommand);
-            
-            Assert.Equal(result, fakeResult);
+            _dispatcher.Handle(fakeCommand, fakeContext);
         }
 
         [Fact]
         public void Handle_Void_Command_Handler()
         {
-            var voidCommand = new VoidCommand();
+            var voidCommand = new Command();
             
-            var handler = new Mock<ICommandHandler<VoidCommand>>();
+            var handler = new Mock<ICommandHandler<Command>>();
             
             handler
                 .Setup(x => x.Handle(voidCommand));
             
             _mockHandlerFactory
-                .Setup(x => x.Resolve(typeof(ICommandHandler<VoidCommand>)))
+                .Setup(x => x.Resolve(typeof(ICommandHandler<Command>)))
                 .Returns(handler.Object);
 
             _dispatcher.Handle(voidCommand);
@@ -64,16 +60,16 @@ namespace Darkness.Cqrs.Tests
         [Fact]
         public async Task Handle_Void_Command_Async_Handler()
         {
-            var voidCommand = new VoidCommand();
+            var voidCommand = new Command();
             
-            var handler = new Mock<ICommandHandlerAsync<VoidCommand>>();
+            var handler = new Mock<ICommandHandlerAsync<Command>>();
             
             handler
                 .Setup(x => x.Handle(voidCommand, _cancellationToken))
                 .Returns(Task.CompletedTask);
             
             _mockHandlerFactory
-                .Setup(x => x.Resolve(typeof(ICommandHandlerAsync<VoidCommand>)))
+                .Setup(x => x.Resolve(typeof(ICommandHandlerAsync<Command>)))
                 .Returns(handler.Object);
 
             await _dispatcher.HandleAsync(voidCommand, _cancellationToken);
@@ -84,21 +80,18 @@ namespace Darkness.Cqrs.Tests
         [Fact]
         public async void Handle_Command_With_Result_Async_Handler()
         {
-            
-            var fakeCommand = new NonVoidCommand();
-            var fakeResult = new CommandResult();
+            var fakeCommand = new Command();
+            var fakeContext = new CommandContext();
 
-            var handler = new Mock<ICommandHandlerAsync<NonVoidCommand, CommandResult>>();
-            handler.Setup(x => x.Handle(fakeCommand, _cancellationToken))
-                .ReturnsAsync(fakeResult);
+            var handler = new Mock<ICommandHandlerAsync<Command, CommandContext>>();
+            handler.Setup(x => x.Handle(fakeCommand, fakeContext, _cancellationToken))
+                .Returns(Task.CompletedTask);
             
             _mockHandlerFactory
-                .Setup(x => x.Resolve(typeof(ICommandHandlerAsync<NonVoidCommand, CommandResult>)))
+                .Setup(x => x.Resolve(typeof(ICommandHandlerAsync<Command, CommandContext>)))
                 .Returns(handler.Object);
 
-            var result = await _dispatcher.HandleAsync(fakeCommand, _cancellationToken);
-            
-            Assert.Equal(result, fakeResult);
+            await _dispatcher.HandleAsync(fakeCommand, fakeContext, _cancellationToken);
         }
         
     }
@@ -106,17 +99,12 @@ namespace Darkness.Cqrs.Tests
     
     
     
-    public class VoidCommand : ICommand
+    public class Command : ICommand
     {
 			
     }
 
-    public class NonVoidCommand : ICommand<CommandResult>
-    {
-			
-    }
-
-    public class CommandResult
+    public class CommandContext
     {
         
     }

@@ -12,11 +12,11 @@ namespace Darkness.Cqrs
 
     }
     
-    public interface ICommandHandler<in TCommand, out TResult> 
-        where TCommand : ICommand<TResult>
+    public interface ICommandHandler<in TCommand, in TContext> 
+        where TCommand : ICommand where TContext : class
     {
 
-        TResult Handle(TCommand command);
+        void Handle(TCommand command, TContext context);
 
     }
     
@@ -27,12 +27,12 @@ namespace Darkness.Cqrs
         Task Handle(TCommand command, CancellationToken cancellationToken);
 
     }
-
-    public interface ICommandHandlerAsync<in TCommand, TResult>
-        where TCommand : ICommand<TResult>
+    
+    public interface ICommandHandlerAsync<in TCommand, in TContext> 
+        where TCommand : ICommand where TContext : class
     {
 
-        Task<TResult> Handle(TCommand command, CancellationToken cancellationToken);
+        Task Handle(TCommand command, TContext context, CancellationToken cancellationToken);
 
     }
     
