@@ -2,6 +2,7 @@ using Moq;
 using Xunit;
 using System.Threading;
 using System.Threading.Tasks;
+using Darkness.Cqrs.Errors;
 using Darkness.Cqrs.Simple;
 
 namespace Darkness.Cqrs.Tests
@@ -93,9 +94,23 @@ namespace Darkness.Cqrs.Tests
 
             await _dispatcher.HandleAsync(fakeCommand, fakeContext, _cancellationToken);
         }
+
+        [Fact]
+        public void Handle_Not_Existing_Command_Handler()
+        {
+            Assert.Throws<HandlerNotFound>(() =>
+            {
+                _dispatcher.Handle(new CommandWithoutHandler());
+            });
+        }
         
     }
 
+    public class CommandWithoutHandler : ICommand
+    {
+        
+    }
+    
     public class Command : ICommand
     {
 			

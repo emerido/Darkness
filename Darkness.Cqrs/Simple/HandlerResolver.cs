@@ -1,4 +1,5 @@
 ﻿using System;
+using Darkness.Cqrs.Errors;
 
 namespace Darkness.Cqrs.Simple
 {
@@ -13,7 +14,7 @@ namespace Darkness.Cqrs.Simple
 
         public object Resolve(Type type)
         {
-            return _serviceProvider.GetService(type);
+            return _serviceProvider.GetService(type) ?? throw new HandlerNotFound(type);
         }
 
         

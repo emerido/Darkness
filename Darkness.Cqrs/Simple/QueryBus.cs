@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Darkness.Cqrs.Errors;
 
 namespace Darkness.Cqrs.Simple
 {
@@ -18,45 +20,33 @@ namespace Darkness.Cqrs.Simple
         {
             if (query == null) 
                 throw new ArgumentNullException(nameof(query));
-            
-            var queryType = query.GetType();
 
-            var handler = Resolver.Resolve(typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResult)));
+            var handlerType = typeof(IQueryHandler<,>)
+                .MakeGenericType(query.GetType(), typeof(TResult));
 
-            var method = handler.GetType().GetMethod("Handle", new[] {query.GetType()});
-
-            return (TResult) method.Invoke(handler, new object[] {query});
+            return Invoke<TResult>(handlerType, query);
         }
 
         public TResult Ask<TResult, TContext>(IQuery<TResult> query, TContext context)
         {
             if (query == null) 
                 throw new ArgumentNullException(nameof(query));
-            
-            var queryType = query.GetType();
-            var resultType = typeof(TResult);
-            var contextType = typeof(TContext);
 
-            var handler = Resolver.Resolve(typeof(IQueryHandler<,,>)
-                .MakeGenericType(queryType, resultType, contextType));
+            var handlerType = typeof(IQueryHandler<,,>)
+                .MakeGenericType(query.GetType(), typeof(TResult), typeof(TContext));
 
-            var method = handler.GetType().GetMethod("Handle", new[] {queryType, contextType});
-
-            return (TResult) method.Invoke(handler, new object[] {query, context});
+            return Invoke<TResult>(handlerType, query, context);
         }
 
         public Task<TResult> AskAsync<TResult>(IQuery<TResult> query, CancellationToken token = default(CancellationToken))
         {
             if (query == null) 
                 throw new ArgumentNullException(nameof(query));
-            
-            var queryType = query.GetType();
 
-            var handler = Resolver.Resolve(typeof(IQueryHandlerAsync<,>).MakeGenericType(queryType, typeof(TResult)));
+            var handlerType = typeof(IQueryHandlerAsync<,>)
+                .MakeGenericType(query.GetType(), typeof(TResult));
 
-            var method = handler.GetType().GetMethod("Handle", new[] {query.GetType(), token.GetType()});
-
-            return (Task<TResult>) method.Invoke(handler, new object[] {query, token});
+            return Invoke<Task<TResult>>(handlerType, query, token);
         }
 
         public Task<TResult> AskAsync<TResult, TContext>(IQuery<TResult> query, TContext context, CancellationToken token = default(CancellationToken))
@@ -64,16 +54,20 @@ namespace Darkness.Cqrs.Simple
             if (query == null) 
                 throw new ArgumentNullException(nameof(query));
             
-            var queryType = query.GetType();
-            var resultType = typeof(TResult);
-            var contextType = typeof(TContext);
+            var handlerType = typeof(IQueryHandlerAsync<,,>)
+                .MakeGenericType(query.GetType(), typeof(TResult), typeof(TContext));
 
-            var handler = Resolver.Resolve(typeof(IQueryHandlerAsync<,,>)
-                .MakeGenericType(queryType, resultType, contextType));
-
-            var method = handler.GetType().GetMethod("Handle", new[] {queryType, contextType, token.GetType()});
-
-            return (Task<TResult>) method.Invoke(handler, new object[] {query, context, token});
+            return Invoke<Task<TResult>>(handlerType, query, context, token);
         }
+
+        private TResult Invoke<TResult>(Type handlerType, params object[] args)
+        {
+            var handler = Resolver.Resolve(handlerType) ?? throw new HandlerNotFound(handlerType);
+
+            var handlerMethod = handler.GetType().GetMethod("Handle", args.Select(x => x.GetType()).ToArray());
+
+            return (TResult) handlerMethod.Invoke(handler, args);
+        }
+
     }
 }
