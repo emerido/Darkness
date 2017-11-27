@@ -66,20 +66,32 @@ namespace Darkness.Cqrs.Simple
         {
             var handler = Resolver.Resolve(handlerType) ?? throw new HandlerNotFound(handlerType);
             
-            handler.GetType()
-                .GetMethod("Handle", args.Select(x => x.GetType()).ToArray())
-                .Invoke(handler, args);
-
+            try
+            {
+                handler.GetType()
+                    .GetMethod("Handle", args.Select(x => x.GetType()).ToArray())
+                    .Invoke(handler, args);
+            }
+            catch (Exception e)
+            {
+                throw e.InnerException;
+            }
         }
         
         private object InvokeAsync(Type handlerType, params object[] args)
         {
             var handler = Resolver.Resolve(handlerType) ?? throw new HandlerNotFound(handlerType);
-            
-            return handler.GetType()
-                .GetMethod("Handle", args.Select(x => x.GetType()).ToArray())
-                .Invoke(handler, args);
 
+            try
+            {
+                return handler.GetType()
+                    .GetMethod("Handle", args.Select(x => x.GetType()).ToArray())
+                    .Invoke(handler, args);
+            }
+            catch (Exception e)
+            {
+                throw e.InnerException;
+            }
         }
         
     }

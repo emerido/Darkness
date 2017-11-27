@@ -66,7 +66,14 @@ namespace Darkness.Cqrs.Simple
 
             var handlerMethod = handler.GetType().GetMethod("Handle", args.Select(x => x.GetType()).ToArray());
 
-            return (TResult) handlerMethod.Invoke(handler, args);
+            try
+            {
+                return (TResult) handlerMethod.Invoke(handler, args);
+            }
+            catch (Exception e)
+            {
+                throw e.InnerException;
+            }
         }
 
     }

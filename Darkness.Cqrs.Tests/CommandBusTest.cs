@@ -1,3 +1,4 @@
+using System;
 using Moq;
 using Xunit;
 using System.Threading;
@@ -102,6 +103,26 @@ namespace Darkness.Cqrs.Tests
             {
                 _dispatcher.Handle(new CommandWithoutHandler());
             });
+        }
+
+
+        [Fact]
+        public void Handle_Exception_In_Command_Handler()
+        {
+            var command = new Command();
+            var handler = new Mock<ICommandHandler<Command>>();
+            
+            handler
+                .Setup(x => x.Handle(command))
+                .Throws<ArgumentException>()
+                ;
+            
+            _mockHandlerFactory
+                .Setup(x => x.Resolve(typeof(ICommandHandler<Command>)))
+                .Returns(handler.Object)
+                ;
+            
+            Assert.Throws<ArgumentException>(() => { _dispatcher.Handle(command); });
         }
         
     }

@@ -116,6 +116,26 @@ namespace Darkness.Cqrs.Tests
                 var t = _dispatcher.Ask(new QueryWithoutHandler());
             });
         }
+
+        [Fact]
+        public void Handle_Exception_In_Query_Handler()
+        {
+            var query = new WrongQuery();
+            var handler = new Mock<IQueryHandler<WrongQuery, Model>>();
+            
+            handler
+                .Setup(x => x.Handle(query))
+                .Throws<ArgumentException>()
+                ;
+            
+            _mockHandlerFactory
+                .Setup(x => x.Resolve(typeof(IQueryHandler<WrongQuery, Model>)))
+                .Returns(handler.Object)
+                ;
+            
+            Assert.Throws<ArgumentException>(() => { var t = _dispatcher.Ask(query); });
+        }
+        
     }
 
     public class QueryWithoutHandler : IQuery<Model>
@@ -137,6 +157,10 @@ namespace Darkness.Cqrs.Tests
     {
         
     }
-    
+
+    public class WrongQuery : IQuery<Model>
+    {
+        
+    }
     
 }
